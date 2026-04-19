@@ -1,4 +1,4 @@
-# Identity Verification DApp (Blockchain Backend)
+# Identity Verification DApp 
 
 ## Overview
 This project is a blockchain-based identity verification system built using Solidity and Hardhat.  
