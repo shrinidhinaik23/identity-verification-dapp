@@ -2,15 +2,15 @@ import React, { useState } from "react";
 import { getContract } from "../services/contract";
 import {
   ensureHardhatNetwork,
-  getReadableStatus,
   getShortError,
+  getReadableStatus,
 } from "../services/web3";
 
-function IdentityDetails() {
+function IdentityDetails({ onIdentityLoaded }) {
   const [identity, setIdentity] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const fetchIdentity = async () => {
+  const handleFetch = async () => {
     if (loading) return;
 
     try {
@@ -20,7 +20,7 @@ function IdentityDetails() {
       const contract = await getContract();
       const result = await contract.getMyIdentity();
 
-      setIdentity({
+      const parsed = {
         identityId: result[0].toString(),
         wallet: result[1],
         name: result[2],
@@ -29,7 +29,13 @@ function IdentityDetails() {
         documentCID: result[5],
         status: result[6].toString(),
         approvalCount: result[7].toString(),
-      });
+      };
+
+      setIdentity(parsed);
+
+      if (onIdentityLoaded) {
+        onIdentityLoaded(parsed);
+      }
     } catch (error) {
       console.error(error);
       alert(getShortError(error));
@@ -46,10 +52,17 @@ function IdentityDetails() {
           <p>Fetch your stored blockchain record</p>
         </div>
 
-        <button className="secondary-btn" onClick={fetchIdentity} disabled={loading}>
+        <button
+          type="button"
+          className="primary-btn"
+          onClick={handleFetch}
+          disabled={loading}
+        >
           {loading ? "Fetching..." : "Fetch Identity"}
         </button>
       </div>
+
+      <div style={{ height: "18px" }}></div>
 
       {!identity ? (
         <div className="empty-box">No identity loaded yet.</div>
@@ -60,6 +73,7 @@ function IdentityDetails() {
               <div className="mini-text">Identity ID</div>
               <h3>#{identity.identityId}</h3>
             </div>
+
             <span className={`status-badge status-${identity.status}`}>
               {getReadableStatus(identity.status)}
             </span>

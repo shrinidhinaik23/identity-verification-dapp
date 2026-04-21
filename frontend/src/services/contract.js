@@ -5,12 +5,15 @@ export const contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
 export const contractABI = [
   "function addIdentity(string _name,string _idNumber,string _documentHash,string _documentCID)",
   "function addVerifier(address verifier)",
+  "function removeVerifier(address verifier)",
   "function approveIdentity(address user,string remark)",
   "function rejectIdentity(address user,string remark)",
   "function revokeIdentity(address user,string reason)",
   "function getMyIdentity() view returns (uint256,address,string,string,string,string,uint8,uint256)",
   "function getIdentity(address user) view returns (uint256,address,string,string,string,string,uint8,uint256)",
+  "function getIdentityById(uint256 _identityId) view returns (uint256,address,string,string,string,string,uint8,uint256)",
   "function getHistoryCount(address user) view returns (uint256)",
+  "function getHistory(address user,uint256 index) view returns (address,uint8,uint8,uint256,string)",
   "function grantAccess(address viewer)",
   "function revokeAccess(address viewer)"
 ];
