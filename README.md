@@ -1,10 +1,10 @@
-🔐 Identity Verification DApp
+# 🔐 Identity Verification DApp
 
 Blockchain-powered identity system with QR-based verification
 
 ---
 
-🚀 Overview
+## 🚀 Overview
 
 A full-stack decentralized identity verification platform that enables secure storage, retrieval, and public verification of identity records using blockchain and IPFS.
 
@@ -12,7 +12,7 @@ This system eliminates centralized trust by leveraging smart contracts + decentr
 
 ---
 
-✨ Key Features
+## ✨ Key Features
 
 - 🧾 Blockchain Identity Storage
   Store identity data securely on Ethereum (Hardhat network)
@@ -37,7 +37,7 @@ This system eliminates centralized trust by leveraging smart contracts + decentr
 
 ---
 
-🏗️ Architecture
+## 🏗️ Architecture
 
 Frontend (React + Vite)
         ↓
@@ -49,7 +49,7 @@ Backend (Node.js Upload Server)
 
 ---
 
-🛠 Tech Stack
+## 🛠 Tech Stack
 
 Layer| Technology
 Frontend| React, Vite, CSS
@@ -61,7 +61,7 @@ Wallet| MetaMask
 
 ---
 
-📂 Project Structure
+## 📂 Project Structure
 
 identity-verification-dapp/
 │
@@ -79,7 +79,7 @@ identity-verification-dapp/
 
 ---
 
-⚙️ Setup Instructions
+## ⚙️ Setup Instructions
 
 1️⃣ Clone Repository
 
@@ -124,7 +124,7 @@ npm run dev
 
 
 
-🧠 How It Works
+## 🧠 How It Works
 
 1. User connects wallet via MetaMask
 2. Identity data is stored in smart contract
@@ -135,7 +135,7 @@ npm run dev
 
 ---
 
-🔥 Future Improvements
+## 🔥 Future Improvements
 
 - 🌍 Deploy to Ethereum Testnet (Sepolia)
 - 📱 Mobile responsiveness optimization
@@ -145,7 +145,7 @@ npm run dev
 
 ---
 
-🎯 Why This Project
+## 🎯 Why This Project
 
 - Demonstrates full-stack + blockchain integration
 - Solves real-world problem of identity verification
@@ -154,19 +154,19 @@ npm run dev
 
 ---
 
-🤝 Contributing
+## 🤝 Contributing
 
 Contributions are welcome! Feel free to fork and improve.
 
 ---
 
-📄 License
+## 📄 License
 
 This project is open-source and available under the MIT License.
 
 ---
 
-👨‍💻 Author
+## 👨‍💻 Author
 
 Shrinidhi Naik
 🔗 GitHub: https://github.com/shrinidhinaik23
