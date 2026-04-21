@@ -1,43 +1,59 @@
 import React, { useState } from "react";
 import { getContract } from "../services/contract";
+import { ensureHardhatNetwork, getShortError } from "../services/web3";
 
 function IdentityForm() {
   const [name, setName] = useState("");
   const [idNumber, setIdNumber] = useState("");
   const [documentHash, setDocumentHash] = useState("");
   const [documentCID, setDocumentCID] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const resetForm = () => {
+    setName("");
+    setIdNumber("");
+    setDocumentHash("");
+    setDocumentCID("");
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (loading) return;
+
+    if (!name.trim() || !idNumber.trim() || !documentHash.trim() || !documentCID.trim()) {
+      alert("Please fill all fields");
+      return;
+    }
 
     try {
+      setLoading(true);
+      await ensureHardhatNetwork();
+
       const contract = await getContract();
-      const tx = await contract.addIdentity(name, idNumber, documentHash, documentCID);
+      const tx = await contract.addIdentity(
+        name.trim(),
+        idNumber.trim(),
+        documentHash.trim(),
+        documentCID.trim()
+      );
+
       await tx.wait();
-
       alert("Identity added successfully");
-
-      setName("");
-      setIdNumber("");
-      setDocumentHash("");
-      setDocumentCID("");
+      resetForm();
     } catch (error) {
       console.error(error);
-      alert(
-        error?.reason ||
-          error?.shortMessage ||
-          error?.message ||
-          "Failed to add identity"
-      );
+      alert(getShortError(error));
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="panel-card">
-      <div className="panel-header">
+      <div className="panel-head">
         <div>
           <h2>Add Identity</h2>
-          <p>Submit identity details for on-chain verification</p>
+          <p>Store your identity details on-chain</p>
         </div>
       </div>
 
@@ -49,6 +65,7 @@ function IdentityForm() {
             placeholder="Enter full name"
             value={name}
             onChange={(e) => setName(e.target.value)}
+            disabled={loading}
           />
         </div>
 
@@ -59,6 +76,7 @@ function IdentityForm() {
             placeholder="Enter ID number"
             value={idNumber}
             onChange={(e) => setIdNumber(e.target.value)}
+            disabled={loading}
           />
         </div>
 
@@ -69,6 +87,7 @@ function IdentityForm() {
             placeholder="Enter document hash"
             value={documentHash}
             onChange={(e) => setDocumentHash(e.target.value)}
+            disabled={loading}
           />
         </div>
 
@@ -76,14 +95,15 @@ function IdentityForm() {
           <label>Document CID</label>
           <input
             type="text"
-            placeholder="Enter IPFS CID"
+            placeholder="Enter document CID"
             value={documentCID}
             onChange={(e) => setDocumentCID(e.target.value)}
+            disabled={loading}
           />
         </div>
 
-        <button className="primary-btn full-width" type="submit">
-          Submit Identity
+        <button className="primary-btn full-btn" type="submit" disabled={loading}>
+          {loading ? "Submitting..." : "Submit Identity"}
         </button>
       </form>
     </div>

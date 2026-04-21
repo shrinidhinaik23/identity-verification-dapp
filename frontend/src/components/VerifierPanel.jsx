@@ -1,69 +1,53 @@
 import React, { useState } from "react";
 import { getContract } from "../services/contract";
+import { ensureHardhatNetwork, getShortError } from "../services/web3";
 
 function VerifierPanel() {
   const [userAddress, setUserAddress] = useState("");
   const [remark, setRemark] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const approve = async () => {
-    try {
-      const contract = await getContract();
-      const tx = await contract.approveIdentity(userAddress, remark);
-      await tx.wait();
-      alert("Identity approved successfully");
-    } catch (error) {
-      console.error(error);
-      alert(
-        error?.reason ||
-          error?.shortMessage ||
-          error?.message ||
-          "Approval failed"
-      );
+  const runAction = async (action) => {
+    if (loading) return;
+
+    if (!userAddress.trim() || !remark.trim()) {
+      alert("Please enter wallet address and remark");
+      return;
     }
-  };
 
-  const reject = async () => {
     try {
+      setLoading(true);
+      await ensureHardhatNetwork();
+
       const contract = await getContract();
-      const tx = await contract.rejectIdentity(userAddress, remark);
+      let tx;
+
+      if (action === "approve") {
+        tx = await contract.approveIdentity(userAddress.trim(), remark.trim());
+      } else if (action === "reject") {
+        tx = await contract.rejectIdentity(userAddress.trim(), remark.trim());
+      } else if (action === "revoke") {
+        tx = await contract.revokeIdentity(userAddress.trim(), remark.trim());
+      } else {
+        throw new Error("Invalid action");
+      }
+
       await tx.wait();
-      alert(
-        "Identity rejected successfully"
-      );
+      alert(`Identity ${action}d successfully`);
     } catch (error) {
       console.error(error);
-      alert(
-        error?.reason ||
-          error?.shortMessage ||
-          error?.message ||
-          "Reject failed"
-      );
-    }
-  };
-
-  const revoke = async () => {
-    try {
-      const contract = await getContract();
-      const tx = await contract.revokeIdentity(userAddress, remark);
-      await tx.wait();
-      alert("Identity revoked successfully");
-    } catch (error) {
-      console.error(error);
-      alert(
-        error?.reason ||
-          error?.shortMessage ||
-          error?.message ||
-          "Revoke failed"
-      );
+      alert(getShortError(error));
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="panel-card verifier-card">
-      <div className="panel-header">
+    <div className="panel-card">
+      <div className="panel-head">
         <div>
           <h2>Verifier Panel</h2>
-          <p>Approve, reject, or revoke a submitted identity</p>
+          <p>Approve, reject, or revoke submitted identities</p>
         </div>
       </div>
 
@@ -75,6 +59,7 @@ function VerifierPanel() {
             placeholder="Enter wallet address"
             value={userAddress}
             onChange={(e) => setUserAddress(e.target.value)}
+            disabled={loading}
           />
         </div>
 
@@ -85,17 +70,18 @@ function VerifierPanel() {
             placeholder="Enter reason"
             value={remark}
             onChange={(e) => setRemark(e.target.value)}
+            disabled={loading}
           />
         </div>
 
         <div className="action-row">
-          <button className="primary-btn" onClick={approve}>
-            Approve
+          <button className="primary-btn" onClick={() => runAction("approve")} disabled={loading}>
+            {loading ? "Processing..." : "Approve"}
           </button>
-          <button className="warn-btn" onClick={reject}>
+          <button className="warn-btn" onClick={() => runAction("reject")} disabled={loading}>
             Reject
           </button>
-          <button className="danger-btn" onClick={revoke}>
+          <button className="danger-btn" onClick={() => runAction("revoke")} disabled={loading}>
             Revoke
           </button>
         </div>

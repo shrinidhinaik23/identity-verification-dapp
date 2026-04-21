@@ -1,41 +1,22 @@
 import React, { useState } from "react";
 import { getContract } from "../services/contract";
-
-function getStatusLabel(status) {
-  switch (status) {
-    case "0":
-      return "Pending";
-    case "1":
-      return "Verified";
-    case "2":
-      return "Rejected";
-    case "3":
-      return "Revoked";
-    default:
-      return "Unknown";
-  }
-}
-
-function getStatusClass(status) {
-  switch (status) {
-    case "0":
-      return "badge pending";
-    case "1":
-      return "badge verified";
-    case "2":
-      return "badge rejected";
-    case "3":
-      return "badge revoked";
-    default:
-      return "badge";
-  }
-}
+import {
+  ensureHardhatNetwork,
+  getReadableStatus,
+  getShortError,
+} from "../services/web3";
 
 function IdentityDetails() {
   const [identity, setIdentity] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const fetchIdentity = async () => {
+    if (loading) return;
+
     try {
+      setLoading(true);
+      await ensureHardhatNetwork();
+
       const contract = await getContract();
       const result = await contract.getMyIdentity();
 
@@ -51,72 +32,68 @@ function IdentityDetails() {
       });
     } catch (error) {
       console.error(error);
-      alert(
-        error?.reason ||
-          error?.shortMessage ||
-          error?.message ||
-          "Failed to fetch identity"
-      );
+      alert(getShortError(error));
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="panel-card">
-      <div className="panel-header panel-header-inline">
+      <div className="panel-head panel-head-row">
         <div>
           <h2>My Identity</h2>
-          <p>View your on-chain identity record</p>
+          <p>Fetch your stored blockchain record</p>
         </div>
-        <button className="secondary-btn" onClick={fetchIdentity}>
-          Fetch Identity
+
+        <button className="secondary-btn" onClick={fetchIdentity} disabled={loading}>
+          {loading ? "Fetching..." : "Fetch Identity"}
         </button>
       </div>
 
       {!identity ? (
-        <div className="empty-state">
-          <p>No identity loaded yet.</p>
-        </div>
+        <div className="empty-box">No identity loaded yet.</div>
       ) : (
-        <div className="identity-card">
+        <div className="identity-wrap">
           <div className="identity-top">
             <div>
-              <p className="mini-label">Identity ID</p>
+              <div className="mini-text">Identity ID</div>
               <h3>#{identity.identityId}</h3>
             </div>
-            <span className={getStatusClass(identity.status)}>
-              {getStatusLabel(identity.status)}
+            <span className={`status-badge status-${identity.status}`}>
+              {getReadableStatus(identity.status)}
             </span>
           </div>
 
           <div className="details-grid">
-            <div className="detail-item">
+            <div className="detail-card">
               <span>Name</span>
               <strong>{identity.name}</strong>
             </div>
 
-            <div className="detail-item">
+            <div className="detail-card">
               <span>ID Number</span>
               <strong>{identity.idNumber}</strong>
             </div>
 
-            <div className="detail-item">
+            <div className="detail-card">
               <span>Wallet</span>
-              <strong className="truncate">{identity.wallet}</strong>
+              <strong className="break-text">{identity.wallet}</strong>
             </div>
 
-            <div className="detail-item">
+            <div className="detail-card">
               <span>Approval Count</span>
               <strong>{identity.approvalCount}</strong>
             </div>
 
-            <div className="detail-item">
+            <div className="detail-card">
               <span>Document Hash</span>
-              <strong className="truncate">{identity.documentHash}</strong>
+              <strong className="break-text">{identity.documentHash}</strong>
             </div>
 
-            <div className="detail-item">
+            <div className="detail-card">
               <span>Document CID</span>
-              <strong className="truncate">{identity.documentCID}</strong>
+              <strong className="break-text">{identity.documentCID}</strong>
             </div>
           </div>
         </div>

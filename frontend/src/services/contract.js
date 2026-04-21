@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 
-export const contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
+export const contractAddress = "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512";
 
 export const contractABI = [
   "function addIdentity(string _name,string _idNumber,string _documentHash,string _documentCID)",
@@ -15,13 +15,24 @@ export const contractABI = [
   "function revokeAccess(address viewer)"
 ];
 
-export const getContract = async () => {
+export const getEthereum = () => {
   if (!window.ethereum) {
     throw new Error("MetaMask not found");
   }
+  return window.ethereum;
+};
 
-  const provider = new ethers.BrowserProvider(window.ethereum);
-  const signer = await provider.getSigner();
+export const getProvider = async () => {
+  const ethereum = getEthereum();
+  return new ethers.BrowserProvider(ethereum);
+};
 
+export const getSigner = async () => {
+  const provider = await getProvider();
+  return provider.getSigner();
+};
+
+export const getContract = async () => {
+  const signer = await getSigner();
   return new ethers.Contract(contractAddress, contractABI, signer);
 };
