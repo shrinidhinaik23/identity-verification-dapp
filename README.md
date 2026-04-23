@@ -83,8 +83,7 @@ identity-verification-dapp/
 
 1️⃣ Clone Repository
 
-git clone https://github.com/shrinidhinaik23
-/identity-verification-dapp.git
+git clone https://github.com/shrinidhinaik23/identity-verification-dapp.git
 
 cd identity-verification-dapp
 
