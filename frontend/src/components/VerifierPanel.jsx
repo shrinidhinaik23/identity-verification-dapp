@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { getContract } from "../services/contract";
 import { ensureHardhatNetwork, getShortError } from "../services/web3";
 
-function VerifierPanel() {
+function VerifierPanel({ onActionComplete }) {
   const [userAddress, setUserAddress] = useState("");
   const [remark, setRemark] = useState("");
   const [loading, setLoading] = useState(false);
@@ -10,7 +10,10 @@ function VerifierPanel() {
   const runAction = async (action) => {
     if (loading) return;
 
-    if (!userAddress.trim() || !remark.trim()) {
+    const trimmedAddress = userAddress.trim();
+    const trimmedRemark = remark.trim();
+
+    if (!trimmedAddress || !trimmedRemark) {
       alert("Please enter wallet address and remark");
       return;
     }
@@ -23,17 +26,24 @@ function VerifierPanel() {
       let tx;
 
       if (action === "approve") {
-        tx = await contract.approveIdentity(userAddress.trim(), remark.trim());
+        tx = await contract.approveIdentity(trimmedAddress, trimmedRemark);
       } else if (action === "reject") {
-        tx = await contract.rejectIdentity(userAddress.trim(), remark.trim());
+        tx = await contract.rejectIdentity(trimmedAddress, trimmedRemark);
       } else if (action === "revoke") {
-        tx = await contract.revokeIdentity(userAddress.trim(), remark.trim());
+        tx = await contract.revokeIdentity(trimmedAddress, trimmedRemark);
       } else {
         throw new Error("Invalid action");
       }
 
       await tx.wait();
+
       alert(`Identity ${action}d successfully`);
+
+      if (onActionComplete) {
+        await onActionComplete(trimmedAddress);
+      }
+
+      setRemark("");
     } catch (error) {
       console.error(error);
       alert(getShortError(error));
@@ -75,14 +85,28 @@ function VerifierPanel() {
         </div>
 
         <div className="action-row">
-          <button className="primary-btn" onClick={() => runAction("approve")} disabled={loading}>
+          <button
+            className="primary-btn"
+            onClick={() => runAction("approve")}
+            disabled={loading}
+          >
             {loading ? "Processing..." : "Approve"}
           </button>
-          <button className="warn-btn" onClick={() => runAction("reject")} disabled={loading}>
-            Reject
+
+          <button
+            className="warn-btn"
+            onClick={() => runAction("reject")}
+            disabled={loading}
+          >
+            {loading ? "Processing..." : "Reject"}
           </button>
-          <button className="danger-btn" onClick={() => runAction("revoke")} disabled={loading}>
-            Revoke
+
+          <button
+            className="danger-btn"
+            onClick={() => runAction("revoke")}
+            disabled={loading}
+          >
+            {loading ? "Processing..." : "Revoke"}
           </button>
         </div>
       </div>

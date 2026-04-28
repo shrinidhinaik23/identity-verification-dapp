@@ -17,10 +17,9 @@ function Sidebar() {
           <NavLink to="/" end className="nav-item">Dashboard</NavLink>
           <NavLink to="/identity" className="nav-item">My Identity</NavLink>
           <NavLink to="/verify-requests" className="nav-item">Verify Requests</NavLink>
-          <NavLink to="/admin" className="nav-item">Admin Panel</NavLink>
+          
           <NavLink to="/search" className="nav-item">Search Identity</NavLink>
           <NavLink to="/history" className="nav-item">History</NavLink>
-          <NavLink to="/access" className="nav-item">Access Control</NavLink>
           <NavLink to="/verify" className="nav-item">Public Verify</NavLink>
         </div>
       </div>

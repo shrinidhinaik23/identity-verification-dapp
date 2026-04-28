@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 
-export const contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
+export const contractAddress = "0x41cE1583863eec0E87ec508c643730D52F1B4BdB";
 
 export const contractABI = [
   "function addIdentity(string _name,string _idNumber,string _documentHash,string _documentCID)",

@@ -14,7 +14,6 @@ function PublicVerifyPage() {
       <section className="section-block">
         <div className="grid-2">
           <VerifyPage />
-          <QRPanel />
         </div>
       </section>
     </div>

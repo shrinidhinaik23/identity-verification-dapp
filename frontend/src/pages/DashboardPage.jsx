@@ -40,10 +40,10 @@ function DashboardPage() {
         <div className="grid-3">
           <Link to="/identity" className="nav-item panel-card">My Identity</Link>
           <Link to="/verify-requests" className="nav-item panel-card">Verify Requests</Link>
-          <Link to="/admin" className="nav-item panel-card">Admin Panel</Link>
+          
           <Link to="/search" className="nav-item panel-card">Search Identity</Link>
           <Link to="/history" className="nav-item panel-card">History</Link>
-          <Link to="/access" className="nav-item panel-card">Access Control</Link>
+          
         </div>
       </section>
     </div>

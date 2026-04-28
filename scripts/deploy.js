@@ -1,11 +1,12 @@
+const hre = require("hardhat");
+
 async function main() {
-  const IdentityVerification = await ethers.getContractFactory("IdentityVerification");
-  const contract = await IdentityVerification.deploy();
+  const IdentityVerification = await hre.ethers.getContractFactory("IdentityVerification");
+  const identityVerification = await IdentityVerification.deploy();
 
-  await contract.waitForDeployment();
+  await identityVerification.waitForDeployment();
 
-  const address = await contract.getAddress();
-  console.log("✅ Contract deployed to:", address);
+  console.log("Contract deployed to:", await identityVerification.getAddress());
 }
 
 main().catch((error) => {

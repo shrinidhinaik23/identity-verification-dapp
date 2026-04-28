@@ -3,7 +3,7 @@ pragma solidity ^0.8.24;
 
 contract IdentityVerification {
     address public admin;
-    uint256 public requiredApprovals = 2;
+    uint256 public requiredApprovals = 1;
     uint256 public identityCounter = 0;
 
     constructor() {
@@ -80,10 +80,6 @@ contract IdentityVerification {
         _;
     }
 
-    // -------------------------
-    // Admin functions
-    // -------------------------
-
     function transferAdmin(address newAdmin) public onlyAdmin {
         require(newAdmin != address(0), "Invalid address");
         admin = newAdmin;
@@ -99,6 +95,7 @@ contract IdentityVerification {
 
     function removeVerifier(address verifier) public onlyAdmin {
         require(verifiers[verifier], "Not a verifier");
+
         verifiers[verifier] = false;
 
         for (uint256 i = 0; i < verifierList.length; i++) {
@@ -128,54 +125,70 @@ contract IdentityVerification {
         return verifierList;
     }
 
-    // -------------------------
-    // Identity functions
-    // -------------------------
-
     function addIdentity(
         string memory _name,
         string memory _idNumber,
         string memory _documentHash,
         string memory _documentCID
     ) public {
-        require(!identities[msg.sender].exists, "Identity already exists");
+        if (!identities[msg.sender].exists) {
+            identityCounter++;
 
-        identityCounter++;
+            identities[msg.sender] = Identity({
+                identityId: identityCounter,
+                userWallet: msg.sender,
+                name: _name,
+                idNumber: _idNumber,
+                documentHash: _documentHash,
+                documentCID: _documentCID,
+                status: Status.Pending,
+                exists: true,
+                approvalCount: 0
+            });
 
-        identities[msg.sender] = Identity({
-            identityId: identityCounter,
-            userWallet: msg.sender,
-            name: _name,
-            idNumber: _idNumber,
-            documentHash: _documentHash,
-            documentCID: _documentCID,
-            status: Status.Pending,
-            exists: true,
-            approvalCount: 0
-        });
+            identityIdToWallet[identityCounter] = msg.sender;
 
-        identityIdToWallet[identityCounter] = msg.sender;
+            history[msg.sender].push(
+                VerificationHistory({
+                    verifier: msg.sender,
+                    oldStatus: Status.Pending,
+                    newStatus: Status.Pending,
+                    timestamp: block.timestamp,
+                    remark: "Identity created"
+                })
+            );
+        } else {
+            Identity storage i = identities[msg.sender];
+            Status old = i.status;
 
-        history[msg.sender].push(
-            VerificationHistory({
-                verifier: msg.sender,
-                oldStatus: Status.Pending,
-                newStatus: Status.Pending,
-                timestamp: block.timestamp,
-                remark: "Identity created"
-            })
-        );
+            i.name = _name;
+            i.idNumber = _idNumber;
+            i.documentHash = _documentHash;
+            i.documentCID = _documentCID;
+            i.status = Status.Pending;
+            i.approvalCount = 0;
+
+            hasApproved[msg.sender][admin] = false;
+
+            history[msg.sender].push(
+                VerificationHistory({
+                    verifier: msg.sender,
+                    oldStatus: old,
+                    newStatus: Status.Pending,
+                    timestamp: block.timestamp,
+                    remark: "Identity updated and resubmitted"
+                })
+            );
+        }
     }
 
-    // -------------------------
-    // Selective data sharing
-    // -------------------------
-
     function grantAccess(address viewer) public identityExists(msg.sender) {
+        require(viewer != address(0), "Invalid address");
         sharedAccess[msg.sender][viewer] = true;
     }
 
     function revokeAccess(address viewer) public identityExists(msg.sender) {
+        require(viewer != address(0), "Invalid address");
         sharedAccess[msg.sender][viewer] = false;
     }
 
@@ -187,10 +200,6 @@ contract IdentityVerification {
             sharedAccess[user][viewer]
         );
     }
-
-    // -------------------------
-    // Multi-verifier approval
-    // -------------------------
 
     function approveIdentity(address user, string memory remark)
         public
@@ -226,6 +235,7 @@ contract IdentityVerification {
         identityExists(user)
     {
         Status old = identities[user].status;
+
         identities[user].status = Status.Rejected;
 
         history[user].push(
@@ -245,6 +255,7 @@ contract IdentityVerification {
         identityExists(user)
     {
         Status old = identities[user].status;
+
         identities[user].status = Status.Revoked;
 
         revocationDetails[user] = RevocationInfo({
@@ -265,10 +276,6 @@ contract IdentityVerification {
         );
     }
 
-    // -------------------------
-    // View functions
-    // -------------------------
-
     function getMyIdentity()
         public
         view
@@ -285,6 +292,7 @@ contract IdentityVerification {
         )
     {
         Identity memory i = identities[msg.sender];
+
         return (
             i.identityId,
             i.userWallet,
@@ -314,6 +322,7 @@ contract IdentityVerification {
         )
     {
         Identity memory i = identities[user];
+
         return (
             i.identityId,
             i.userWallet,
@@ -344,6 +353,7 @@ contract IdentityVerification {
         require(identities[user].exists, "Identity not found");
 
         Identity memory i = identities[user];
+
         return (
             i.identityId,
             i.userWallet,
@@ -380,8 +390,16 @@ contract IdentityVerification {
         )
     {
         require(index < history[user].length, "Invalid history index");
+
         VerificationHistory memory h = history[user][index];
-        return (h.verifier, h.oldStatus, h.newStatus, h.timestamp, h.remark);
+
+        return (
+            h.verifier,
+            h.oldStatus,
+            h.newStatus,
+            h.timestamp,
+            h.remark
+        );
     }
 
     function getRevocationInfo(address user)
@@ -397,7 +415,13 @@ contract IdentityVerification {
         )
     {
         RevocationInfo memory r = revocationDetails[user];
-        return (r.revoked, r.revokedBy, r.revokedAt, r.reason);
+
+        return (
+            r.revoked,
+            r.revokedBy,
+            r.revokedAt,
+            r.reason
+        );
     }
 
     function isVerifier(address user) public view returns (bool) {

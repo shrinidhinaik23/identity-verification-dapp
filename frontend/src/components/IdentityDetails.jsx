@@ -1,10 +1,6 @@
 import React, { useState } from "react";
 import { getContract } from "../services/contract";
-import {
-  ensureHardhatNetwork,
-  getShortError,
-  getReadableStatus,
-} from "../services/web3";
+import { getShortError, getReadableStatus } from "../services/web3";
 
 function IdentityDetails({ onIdentityLoaded }) {
   const [identity, setIdentity] = useState(null);
@@ -15,7 +11,6 @@ function IdentityDetails({ onIdentityLoaded }) {
 
     try {
       setLoading(true);
-      await ensureHardhatNetwork();
 
       const contract = await getContract();
       const result = await contract.getMyIdentity();
@@ -27,18 +22,25 @@ function IdentityDetails({ onIdentityLoaded }) {
         idNumber: result[3],
         documentHash: result[4],
         documentCID: result[5],
-        status: result[6].toString(),
+        status: Number(result[6]),
         approvalCount: result[7].toString(),
       };
 
       setIdentity(parsed);
-
-      if (onIdentityLoaded) {
-        onIdentityLoaded(parsed);
-      }
+      onIdentityLoaded?.(parsed);
     } catch (error) {
       console.error(error);
-      alert(getShortError(error));
+
+      const msg = getShortError(error);
+
+      if (
+        msg.includes("Identity not found") ||
+        msg.includes("could not decode result data")
+      ) {
+        alert("No identity found for this wallet. Please add identity first.");
+      } else {
+        alert(msg);
+      }
     } finally {
       setLoading(false);
     }

@@ -9,6 +9,14 @@ dotenv.config();
 const app = express();
 const upload = multer({ storage: multer.memoryStorage() });
 
+// fileFilter: (req, file, cb) => {
+//if (file.mimetype === 'application/pdf') {
+//   cb(null, true);
+//} else {
+//   cb(new Error("Only PDF allowed"), false);
+//  }
+//}
+
 app.use(cors());
 
 const pinata = new PinataSDK({

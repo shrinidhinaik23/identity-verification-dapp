@@ -40,7 +40,6 @@ function QRPanel() {
     } catch (error) {
       console.error(error);
       alert(getShortError(error));
-      setIdentity(null);
     } finally {
       setLoading(false);
     }
@@ -48,14 +47,8 @@ function QRPanel() {
 
   const copyIdentityId = async () => {
     if (!identity?.identityId) return;
-
-    try {
-      await navigator.clipboard.writeText(identity.identityId);
-      alert("Identity ID copied");
-    } catch (error) {
-      console.error(error);
-      alert("Failed to copy");
-    }
+    await navigator.clipboard.writeText(identity.identityId);
+    alert("Copied!");
   };
 
   return (
@@ -63,7 +56,7 @@ function QRPanel() {
       <div className="panel-head">
         <div>
           <h2>QR Lookup</h2>
-          <p>Generate and verify identity using identity ID</p>
+          <p>Generate and verify identity using ID</p>
         </div>
       </div>
 
@@ -71,33 +64,28 @@ function QRPanel() {
         <div className="input-group">
           <label>Identity ID</label>
           <input
-            type="text"
+            type="number"
             placeholder="Enter identity ID"
             value={identityId}
             onChange={(e) => setIdentityId(e.target.value)}
-            disabled={loading}
           />
         </div>
 
         <button
-          className="secondary-btn full-btn"
+          className="primary-btn full-btn"
           onClick={handleLookup}
-          disabled={loading}
-          type="button"
         >
           {loading ? "Fetching..." : "Lookup Identity"}
         </button>
       </div>
 
-      <div style={{ height: "18px" }}></div>
-
       {!identity ? (
-        <div className="empty-box">No QR lookup result yet.</div>
+        <div className="empty-box">No result yet</div>
       ) : (
         <div className="identity-wrap">
           <div className="identity-top">
             <div>
-              <div className="mini-text">Identity ID</div>
+              <span className="mini-text">Identity ID</span>
               <h3>#{identity.identityId}</h3>
             </div>
 
@@ -107,58 +95,19 @@ function QRPanel() {
           </div>
 
           <div className="qr-card">
-            <QRCodeCanvas
-              value={identity.identityId}
-              size={180}
-              bgColor="#ffffff"
-              fgColor="#111111"
-              level="H"
-              includeMargin
-            />
-
-            <div className="qr-info">
-              <p className="mini-text">QR Encoded Value</p>
-              <strong>{identity.identityId}</strong>
-              <button
-                className="secondary-btn"
-                onClick={copyIdentityId}
-                type="button"
-              >
-                Copy Identity ID
-              </button>
-            </div>
+            <QRCodeCanvas value={identity.identityId} size={160} />
+            <button className="secondary-btn" onClick={copyIdentityId}>
+              Copy ID
+            </button>
           </div>
 
           <div className="details-grid">
-            <div className="detail-card">
-              <span>Name</span>
-              <strong>{identity.name}</strong>
-            </div>
-
-            <div className="detail-card">
-              <span>ID Number</span>
-              <strong>{identity.idNumber}</strong>
-            </div>
-
-            <div className="detail-card">
-              <span>Wallet</span>
-              <strong className="break-text">{identity.wallet}</strong>
-            </div>
-
-            <div className="detail-card">
-              <span>Approval Count</span>
-              <strong>{identity.approvalCount}</strong>
-            </div>
-
-            <div className="detail-card">
-              <span>Document Hash</span>
-              <strong className="break-text">{identity.documentHash}</strong>
-            </div>
-
-            <div className="detail-card">
-              <span>Document CID</span>
-              <strong className="break-text">{identity.documentCID}</strong>
-            </div>
+            <div className="detail-card"><span>Name</span><strong>{identity.name}</strong></div>
+            <div className="detail-card"><span>ID</span><strong>{identity.idNumber}</strong></div>
+            <div className="detail-card"><span>Wallet</span><strong className="break-text">{identity.wallet}</strong></div>
+            <div className="detail-card"><span>Approvals</span><strong>{identity.approvalCount}</strong></div>
+            <div className="detail-card"><span>Hash</span><strong className="break-text">{identity.documentHash}</strong></div>
+            <div className="detail-card"><span>CID</span><strong className="break-text">{identity.documentCID}</strong></div>
           </div>
         </div>
       )}
