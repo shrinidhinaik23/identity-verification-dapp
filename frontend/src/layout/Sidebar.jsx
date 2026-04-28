@@ -1,7 +1,7 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
 
-function Sidebar() {
+function Sidebar({ role }) {
   return (
     <aside className="sidebar">
       <div>
@@ -14,17 +14,39 @@ function Sidebar() {
         </div>
 
         <div className="nav-box">
-          <NavLink to="/" end className="nav-item">Dashboard</NavLink>
-          <NavLink to="/identity" className="nav-item">My Identity</NavLink>
-          <NavLink to="/verify-requests" className="nav-item">Verify Requests</NavLink>
-          
-          <NavLink to="/search" className="nav-item">Search Identity</NavLink>
-          <NavLink to="/history" className="nav-item">History</NavLink>
-          <NavLink to="/verify" className="nav-item">Public Verify</NavLink>
+          <NavLink to="/" end className="nav-item">
+            Dashboard
+          </NavLink>
+
+          <NavLink to="/identity" className="nav-item">
+            My Identity
+          </NavLink>
+
+          <NavLink to="/verify-requests" className="nav-item">
+            Verify Requests
+          </NavLink>
+
+          {role === "admin" && (
+            <NavLink to="/admin" className="nav-item">
+              Admin Panel
+            </NavLink>
+          )}
+
+          <NavLink to="/search" className="nav-item">
+            Search Identity
+          </NavLink>
+
+          <NavLink to="/history" className="nav-item">
+            History
+          </NavLink>
+
+          <NavLink to="/verify" className="nav-item">
+            Public Verify
+          </NavLink>
         </div>
       </div>
 
-      <div className="network-pill">● Hardhat Local</div>
+      <div className="network-pill">● Ganache Local</div>
     </aside>
   );
 }

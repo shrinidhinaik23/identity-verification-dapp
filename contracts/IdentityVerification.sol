@@ -202,33 +202,34 @@ contract IdentityVerification {
     }
 
     function approveIdentity(address user, string memory remark)
-        public
-        onlyVerifier
-        identityExists(user)
-    {
-        require(identities[user].status == Status.Pending, "Identity not pending");
-        require(!hasApproved[user][msg.sender], "Already approved by this verifier");
+    public
+    onlyVerifier
+    identityExists(user)
+{
+    require(user != msg.sender, "You cannot verify your own identity");
+    require(identities[user].status == Status.Pending, "Identity not pending");
+    require(!hasApproved[user][msg.sender], "Already approved by this verifier");
+    
 
-        Status old = identities[user].status;
+    Status old = identities[user].status;
 
-        hasApproved[user][msg.sender] = true;
-        identities[user].approvalCount += 1;
+    hasApproved[user][msg.sender] = true;
+    identities[user].approvalCount += 1;
 
-        if (identities[user].approvalCount >= requiredApprovals) {
-            identities[user].status = Status.Verified;
-        }
-
-        history[user].push(
-            VerificationHistory({
-                verifier: msg.sender,
-                oldStatus: old,
-                newStatus: identities[user].status,
-                timestamp: block.timestamp,
-                remark: remark
-            })
-        );
+    if (identities[user].approvalCount >= requiredApprovals) {
+        identities[user].status = Status.Verified;
     }
 
+    history[user].push(
+        VerificationHistory({
+            verifier: msg.sender,
+            oldStatus: old,
+            newStatus: identities[user].status,
+            timestamp: block.timestamp,
+            remark: remark
+        })
+    );
+}
     function rejectIdentity(address user, string memory remark)
         public
         onlyVerifier

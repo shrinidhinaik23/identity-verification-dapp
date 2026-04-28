@@ -1,9 +1,10 @@
 export const ADMIN_WALLETS = [
-  "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266".toLowerCase()
+  "0xb8108A6FcfB8b4c61714901bCFF40C6B422C8315".toLowerCase()
 ];
 
 export const VERIFIER_WALLETS = [
-  "0x70997970c51812dc3a010c7d01b50e0d17dc79c8".toLowerCase()
+  "0xb8108A6FcfB8b4c61714901bCFF40C6B422C8315".toLowerCase(),
+  "0xBf64df84590D573BC963f814946eBEB33870705E".toLowerCase()
 ];
 
 export const getUserRole = (wallet) => {
@@ -11,13 +12,8 @@ export const getUserRole = (wallet) => {
 
   const normalized = wallet.toLowerCase();
 
-  if (ADMIN_WALLETS.includes(normalized)) {
-    return "admin";
-  }
-
-  if (VERIFIER_WALLETS.includes(normalized)) {
-    return "verifier";
-  }
+  if (ADMIN_WALLETS.includes(normalized)) return "admin";
+  if (VERIFIER_WALLETS.includes(normalized)) return "verifier";
 
   return "user";
 };

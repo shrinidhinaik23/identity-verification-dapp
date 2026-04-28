@@ -9,12 +9,10 @@ function AppLayout() {
   const [wallet, setWallet] = useState("");
 
   useEffect(() => {
-    let mounted = true;
-
     const init = async () => {
       try {
         const current = await getCurrentWallet();
-        if (mounted && current) setWallet(current);
+        setWallet(current || "");
       } catch (error) {
         console.error(error);
       }
@@ -30,21 +28,16 @@ function AppLayout() {
       window.ethereum.on("accountsChanged", handleAccountsChanged);
 
       return () => {
-        mounted = false;
         window.ethereum.removeListener("accountsChanged", handleAccountsChanged);
       };
     }
-
-    return () => {
-      mounted = false;
-    };
   }, []);
 
   const role = useMemo(() => getUserRole(wallet), [wallet]);
 
   return (
     <div className="app-shell">
-      <Sidebar />
+      <Sidebar role={role} />
       <main className="main-content">
         <Topbar wallet={wallet} setWallet={setWallet} role={role} />
         <Outlet context={{ wallet, setWallet, role }} />

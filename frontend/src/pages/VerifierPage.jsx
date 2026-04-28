@@ -1,18 +1,20 @@
 import React from "react";
+import { useOutletContext } from "react-router-dom";
 import VerifierPanel from "../components/VerifierPanel";
-import SectionHeader from "../layout/SectionHeader";
 
 function VerifierPage() {
-  return (
-    <div className="dashboard-sections">
-      <section className="section-block">
-        
-        <div className="grid-1">
-          <VerifierPanel />
-        </div>
-      </section>
-    </div>
-  );
+  const { role } = useOutletContext();
+
+  if (role !== "admin" && role !== "verifier") {
+    return (
+      <div className="panel-card">
+        <h2>Access Denied</h2>
+        <p>Only admin or verifier can verify identities.</p>
+      </div>
+    );
+  }
+
+  return <VerifierPanel />;
 }
 
 export default VerifierPage;
